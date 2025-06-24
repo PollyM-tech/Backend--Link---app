@@ -9,13 +9,13 @@ class CategoryResource(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument("name", required=True, help="Category name is required")
 
-    @jwt_required
+    @jwt_required()
     def get(self, id=None):
         user_id = get_jwt_identity()
 
         if id is None:
             categories = Category.query.filter_by(user_id=user_id).all()
-            return jsonify([category.todict() for category in categories])
+            return jsonify([category.to_dict() for category in categories])
         else:
             category = Category.query.filter_by(id=id, user_id=user_id).first()
             
@@ -27,7 +27,7 @@ class CategoryResource(Resource):
     def post(self):
         user_id = get_jwt_identity()
         data = self.parser.parse_args()
-
+       
         # validate input 
         if not data.get("name"):
             return {"message": "Category name is required"}, 400
