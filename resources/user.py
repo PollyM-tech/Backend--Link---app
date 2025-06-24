@@ -48,7 +48,7 @@ class LoginResource(Resource):
         user = User.query.filter_by(email=data["email"]).first()
 
         if user is None:
-            return {"message": "Invalid email or password"}
+            return {"message": "Invalid email or password"}, 403
         
         # check if password is correct
         if check_password_hash(user.password, data["password"]):
