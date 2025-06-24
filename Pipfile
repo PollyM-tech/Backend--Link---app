@@ -5,15 +5,21 @@ name = "pypi"
 
 [packages]
 flask = "*"
-flask-sqlalchemy = "*"
 flask-migrate = "*"
 flask-cors = "*"
 flask-restful = "*"
 flask-bcrypt = "*"
 flask-jwt-extended = "*"
+<<<<<<< HEAD
 python-dotenv = "*"
 sqlalchemy-serializer = "*"
 ipython = "*"
+=======
+flask-restful = "*"
+sqlalchemy-serializer = "*"
+flask-sqlalchemy = "*"
+python-dotenv = "*"
+>>>>>>> c7359962f5096647c3f8bca52b58de8fe599148d
 
 [dev-packages]
 
