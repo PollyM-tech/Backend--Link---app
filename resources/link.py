@@ -9,6 +9,8 @@ class LinkResource(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument("title", required=True, help="Link title is required")
     parser.add_argument("url", required=True, help="Link URL is required")
+    parser.add_argument("description", required=False)
+    parser.add_argument("category_id", required=False, type=int)
 
     @jwt_required()
     def get(self, id=None):
@@ -28,8 +30,14 @@ class LinkResource(Resource):
         user_id = get_jwt_identity()
         data = self.parser.parse_args()
 
-        link = Link(title=data["title"], url=data["url"], user_id=user_id)
-        db.session.add(link)
+        new_link = Link(
+            title=data["title"],
+            url=data["url"],
+            description=data.get("description"),
+            category_id=data.get("category_id"),
+            user_id=user_id
+        )
+        db.session.add(new_link)
         db.session.commit()
 
         return {"message": "Link created successfully"}, 201
@@ -45,6 +53,8 @@ class LinkResource(Resource):
 
         link.title = data.get("title", link.title)
         link.url = data.get("url", link.url)
+        link.description = data.get("description", link.description)
+        link.category_id = data.get("category_id", link.category_id)
 
         db.session.commit()
         return {"message": "Link updated successfully", "link": link.to_dict()}, 200
