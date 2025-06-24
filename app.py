@@ -11,10 +11,9 @@ from dotenv import load_dotenv
 
 # Import models and database
 from models import db
-
-# from resources.users import SignUpResource, LoginResource
-# from resources.links import LinkListResource, LinkResource
-# from resources.categories import CategoryListResource
+from resources.user import SignUpResource, LoginResource
+from resources.link import LinkResource
+from resources.category import CategoryResource
 
 
 load_dotenv()
@@ -40,12 +39,11 @@ class Index(Resource):
         return {"message": "Welcome to the LinkSaver API"}
 
 
-# api.add_resource(Index, "/")
-# api.add_resource(SignUpResource, "/signup")
-# api.add_resource(LoginResource, "/login")
-# api.add_resource(LinkListResource, "/links")
-# api.add_resource(LinkResource, "/links/<int:id>")
-# api.add_resource(CategoryListResource, "/categories")
+api.add_resource(Index, "/")
+api.add_resource(SignUpResource, "/signup")
+api.add_resource(LoginResource, "/login")
+api.add_resource(LinkResource, "/links", "/links/<int:id>")
+api.add_resource(CategoryResource, "/categories", "/categories/<int:id>")
 
 if __name__ == "__main__":
     app.run(debug=True, port=5555)

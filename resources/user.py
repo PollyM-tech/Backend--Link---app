@@ -51,7 +51,7 @@ class LoginResource(Resource):
             return {"message": "Invalid email or password"}, 403
         
         # check if password is correct
-        if check_password_hash(user.password, data["password"]):
+        if check_password_hash(user.password_hash, data["password"]):
             #generate token
             access_token = create_access_token(identity=user.id)
 
