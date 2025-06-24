@@ -1,43 +1,63 @@
-from flask import Blueprint, request, jsonify
-from models import db, Link
+from flask import jsonify
+from flask_restful import Resource, reqparse
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-#Creates a blueprint for link related routes
-link_bp = Blueprint("link_bp", __name__)
+from models import Link, db
 
-# Route to add a new link
-@link_bp.route("/links", methods=["POST"])
-def add_link():
-    data = request.get_json()
-    new_link = Link(title=data["title"], url=data["url"])
-    db.session.add(new_link)
-    db.session.commit()
-    return jsonify({"message": "Link saved successfully"}), 201
+class LinkResource(Resource):
+    # parser for POST and PATCH
+    parser = reqparse.RequestParser()
+    parser.add_argument("title", required=True, help="Link title is required")
+    parser.add_argument("url", required=True, help="Link URL is required")
 
-# Route to retrieve a single link by id
-@link_bp.route("/links", methods=["GET"])
-def get_links():
-    links = Link.query.all()
-    result = [{"id": link.id, "title": link.title, "url": link.url} for link in links]
-    return jsonify(result), 200
+    @jwt_required()
+    def get(self, id=None):
+        user_id = get_jwt_identity()
 
-@link_bp.route("/links/<int:id>", methods=["GET"])
-def get_link(id):
-    link = Link.query.get_or_404(id)
-    return jsonify({"id": link.id, "title": link.title, "url": link.url}), 200
+        if id is None:
+            links = Link.query.filter_by(user_id=user_id).all()
+            return jsonify([link.to_dict() for link in links])
+        else:
+            link = Link.query.filter_by(id=id, user_id=user_id).first()
+            if link is None:
+                return {"message": "Link not found"}, 404
+            return jsonify(link.to_dict())
 
-# route to deletes links by id 
-@link_bp.route("/links/<int:id>", methods=["DELETE"])
-def delete_link(id):
-    link = Link.query.get_or_404(id)
-    db.session.delete(link)
-    db.session.commit()
-    return jsonify({"message": "Link deleted successfully"}), 200
-# route to updates links by id
-@link_bp.route("/links/<int:id>", methods=["PUT"])
-def update_link(id):
-    data = request.get_json()
-    link = Link.query.get_or_404(id)
-    link.title = data.get("title", link.title)
-    link.url = data.get("url", link.url)
-    db.session.commit()
-    return jsonify({"message": "Link updated successfully"}), 200
+    @jwt_required()
+    def post(self):
+        user_id = get_jwt_identity()
+        data = self.parser.parse_args()
+
+        link = Link(title=data["title"], url=data["url"], user_id=user_id)
+        db.session.add(link)
+        db.session.commit()
+
+        return {"message": "Link created successfully"}, 201
+
+    @jwt_required()
+    def patch(self, id):
+        user_id = get_jwt_identity()
+        data = self.parser.parse_args()
+
+        link = Link.query.filter_by(id=id, user_id=user_id).first()
+        if link is None:
+            return {"message": "Link not found"}, 404
+
+        link.title = data.get("title", link.title)
+        link.url = data.get("url", link.url)
+
+        db.session.commit()
+        return {"message": "Link updated successfully", "link": link.to_dict()}, 200
+
+    @jwt_required()
+    def delete(self, id):
+        user_id = get_jwt_identity()
+
+        link = Link.query.filter_by(id=id, user_id=user_id).first()
+        if link is None:
+            return {"message": "Link not found"}, 404
+
+        db.session.delete(link)
+        db.session.commit()
+        return {"message": "Link deleted successfully"}, 200
+
