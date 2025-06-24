@@ -1,27 +1,44 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from models import db
-from dotenv import load_dotenv
 import os
+from datetime import timedelta
+from flask import Flask
+from flask_restful import Api, Resource
+from flask_migrate import Migrate
+from flask_cors import CORS
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
+from dotenv import load_dotenv
+from models import db
+# from resources.users import SignUpResource, LoginResource
+# from resources.links import LinkListResource, LinkResource
+# from resources.categories import CategoryListResource
 
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
+api = Api(app)
 
-#configurations
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI", "sqlite:///linksaver.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///linksaver.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-#database and migrations
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET", "super-secret-key")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
+app.config["BUNDLE_ERRORS"] = True
 db.init_app(app)
 migrate = Migrate(app, db)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
-@app.route("/")
-def index():
-    return {"message": "Welcome to the simplified LinkSaver App"}
+class Index(Resource):
+    def get(self):
+        return {"message": "Welcome to the LinkSaver API"}
 
 
+api.add_resource(Index, "/")
+# api.add_resource(SignUpResource, "/signup")
+# api.add_resource(LoginResource, "/login")
+# api.add_resource(LinkListResource, "/links")
+# api.add_resource(LinkResource, "/links/<int:id>")
+# api.add_resource(CategoryListResource, "/categories")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5555)

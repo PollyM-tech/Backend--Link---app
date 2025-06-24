@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from datetime import datetime
 
-# Naming convention for constraints
 naming_convention = {
     "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -12,11 +11,9 @@ naming_convention = {
     "pk": "pk_%(table_name)s",
 }
 
-# MetaData with naming convention
 metadata = MetaData(naming_convention=naming_convention)
 db = SQLAlchemy(metadata=metadata)
 
-# MODELS
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
@@ -26,29 +23,24 @@ class User(db.Model, SerializerMixin):
     password_hash = db.Column(db.VARCHAR, nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.now())
 
-    categories = db.relationship("Category", back_populates="user")
-    links = db.relationship("Link", back_populates="user")
+    categories = db.relationship("Category", back_populates="user", cascade="all, delete")
+    links = db.relationship("Link", back_populates="user", cascade="all, delete")
 
     serialize_rules = ("-password_hash", "-categories", "-links")
-
 
 class Category(db.Model, SerializerMixin):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=True
-    )
     created_at = db.Column(db.TIMESTAMP, default=datetime.now())
 
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"))
     user = db.relationship("User", back_populates="categories", uselist=False)
-    links = db.relationship("Link", back_populates="category")
 
-    serialize_rules = ("-user_id", "-user", "-links")
+    links = db.relationship("Link", back_populates="category", cascade="all, delete-orphan")
 
+    serialize_rules = ("-user", "-links")
 
 class Link(db.Model, SerializerMixin):
     __tablename__ = "links"
@@ -59,20 +51,36 @@ class Link(db.Model, SerializerMixin):
     description = db.Column(db.Text)
     created_at = db.Column(db.TIMESTAMP, default=datetime.now())
 
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False
-    )
-    category_id = db.Column(
-        db.Integer,
-        db.ForeignKey("categories.id", ondelete="SET NULL"),
-        nullable=True
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id", ondelete="SET NULL"))
 
     user = db.relationship("User", back_populates="links", uselist=False)
     category = db.relationship("Category", back_populates="links", uselist=False)
 
-    serialize_rules = ("-user", "-category")
+    link_tags = db.relationship("LinkTag", back_populates="link", cascade="all, delete-orphan")
 
-    
+    serialize_rules = ("-user", "-category", "-link_tags")
+
+class Tag(db.Model, SerializerMixin):
+    __tablename__ = "tags"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+
+    link_tags = db.relationship("LinkTag", back_populates="tag", cascade="all, delete-orphan")
+
+    serialize_rules = ("-link_tags",)
+
+class LinkTag(db.Model, SerializerMixin):
+    __tablename__ = "link_tags"
+
+    id = db.Column(db.Integer, primary_key=True)
+    link_id = db.Column(db.Integer, db.ForeignKey("links.id", ondelete="CASCADE"), nullable=False)
+    tag_id = db.Column(db.Integer, db.ForeignKey("tags.id", ondelete="CASCADE"), nullable=False)
+
+    note = db.Column(db.Text)
+
+    link = db.relationship("Link", back_populates="link_tags")
+    tag = db.relationship("Tag", back_populates="link_tags")
+
+    serialize_rules = ("-link", "-tag")
