@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
 
-function FloatingButton({ setShowModal, setIsEdit, setFormData }) {
+function FloatingIcon({ setShowModal, setIsEdit, setFormData }) {
   const handleClick = () => {
     setShowModal(true);
     setIsEdit(false);
@@ -24,4 +24,4 @@ function FloatingButton({ setShowModal, setIsEdit, setFormData }) {
   );
 }
 
-export default FloatingButton;
+export default FloatingIcon;

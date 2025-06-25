@@ -1,3 +1,5 @@
+import React from 'react';
+
 function Header({ handleLogout }) {
   return (
     <header className="bg-white flex justify-between items-center px-6 py-4 shadow">

@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
-import Sidebar from "./Sidebar";
+import Sidebar from "./SideBar";
 import SearchBar from "./SearchBar";
 import LinkCard from "./LinkCard";
 import Modal from "./Modal";
-import FloatingButton from "./FloatingButton";
+import FloatingIcon from "./FloatingIcon";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -123,7 +123,7 @@ function Dashboard() {
   const handleLogout = () => {
     delete axios.defaults.headers.common["Authorization"];
     localStorage.removeItem("user");
-    navigate("/login");
+    navigate("/");
   };
 
   return (
@@ -156,7 +156,7 @@ function Dashboard() {
             ))}
           </div>
 
-          <FloatingButton
+          <FloatingIcon
             setShowModal={setShowModal}
             setIsEdit={setIsEdit}
             setFormData={setFormData}
