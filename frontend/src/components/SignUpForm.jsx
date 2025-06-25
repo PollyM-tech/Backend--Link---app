@@ -105,7 +105,7 @@ function SignupForm() {
         <p className="mt-4 text-center text-sm text-gray-800">
           Already a member?{" "}
           <Link
-            to="/login"
+            to="/"
             className="text-blue-800 hover:underline font-semibold"
           >
             Sign in
