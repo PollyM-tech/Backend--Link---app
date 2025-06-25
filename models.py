@@ -57,30 +57,6 @@ class Link(db.Model, SerializerMixin):
     user = db.relationship("User", back_populates="links", uselist=False)
     category = db.relationship("Category", back_populates="links", uselist=False)
 
-    link_tags = db.relationship("LinkTag", back_populates="link", cascade="all, delete-orphan")
+    #link_tags = db.relationship("LinkTag", back_populates="link", cascade="all, delete-orphan")
 
-    serialize_rules = ("-user", "-category", "-link_tags")
-
-class Tag(db.Model, SerializerMixin):
-    __tablename__ = "tags"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False, unique=True)
-
-    link_tags = db.relationship("LinkTag", back_populates="tag", cascade="all, delete-orphan")
-
-    serialize_rules = ("-link_tags",)
-
-class LinkTag(db.Model, SerializerMixin):
-    __tablename__ = "link_tags"
-
-    id = db.Column(db.Integer, primary_key=True)
-    link_id = db.Column(db.Integer, db.ForeignKey("links.id", ondelete="CASCADE"), nullable=False)
-    tag_id = db.Column(db.Integer, db.ForeignKey("tags.id", ondelete="CASCADE"), nullable=False)
-
-    note = db.Column(db.Text)
-
-    link = db.relationship("Link", back_populates="link_tags")
-    tag = db.relationship("Tag", back_populates="link_tags")
-
-    serialize_rules = ("-link", "-tag")
+    serialize_rules = ("-user", "-category")
