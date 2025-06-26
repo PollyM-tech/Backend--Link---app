@@ -3,7 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import toast from "react-hot-toast"
+import { toast } from "react-toastify";
 
 const signupSchema = z.object({
   username: z.string().min(3, "Username is required"),
