@@ -37,8 +37,8 @@ function SignupForm() {
 
       navigate("/main");
     } catch (err) {
-      //toast.error(result.message);
-      toast.error(result.message);
+      console.error("Signup error:", err);
+      toast.error("Signup failed");
     }
   };
 
