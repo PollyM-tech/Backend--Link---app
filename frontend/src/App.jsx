@@ -6,7 +6,7 @@ import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
-    <Router>
+    <>
     <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route path="/signup" element={<SignUpPage />} />
@@ -24,7 +24,7 @@ const App = () => {
         pauseOnHover
         theme="dark" 
       />
-    </Router>
+    </>
   );
 };
 
