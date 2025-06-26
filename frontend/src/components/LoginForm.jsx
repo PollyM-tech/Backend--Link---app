@@ -3,6 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -36,7 +37,7 @@ function LoginForm() {
     navigate("/main");
   } catch (err) {
     console.error("Login error:", err);
-    alert("Invalid credentials");
+    toast.error("Invalid credentials");
   }
 };
 
