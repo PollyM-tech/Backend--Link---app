@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { BASE_URL } from "../utilis";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -23,7 +24,7 @@ function LoginForm() {
 
   const onSubmit = async (data) => {
   try {
-    const response = await axios.post("http://localhost:5000/login", data);
+    const response = await axios.post(`${BASE_URL}/login`, data);
 
     //Store token + user info in a way Dashboard understands
     localStorage.setItem(

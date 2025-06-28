@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { BASE_URL } from "../utilis";
 
 const signupSchema = z.object({
   username: z.string().min(3, "Username is required"),
@@ -24,7 +25,7 @@ function SignupForm() {
 
  const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:5000/signup", data);
+      const response = await axios.post(`${BASE_URL}/signup`, data);
 
       //Store token and user info correctly
       localStorage.setItem(

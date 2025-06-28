@@ -7,6 +7,7 @@ import SearchBar from "./SearchBar";
 import LinkCard from "./LinkCard";
 import Modal from "./Modal";
 import FloatingIcon from "./FloatingIcon";
+import { BASE_URL } from "../utilis";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -40,12 +41,12 @@ function Dashboard() {
   }, []);
 
   const fetchCategories = async () => {
-    const res = await axios.get("http://localhost:5000/categories");
+    const res = await axios.get(`${BASE_URL}/categories`);
     setCategories(res.data);
   };
 
   const fetchLinks = async () => {
-    const res = await axios.get("http://localhost:5000/links");
+    const res = await axios.get(`${BASE_URL}/links`);
     setLinks(res.data);
     setFilteredLinks(res.data);
   };
@@ -55,7 +56,7 @@ function Dashboard() {
     let finalCategoryId = formData.category_id;
 
     if (!formData.category_id && formData.newCategoryName) {
-      const res = await axios.post("http://localhost:5000/categories", {
+      const res = await axios.post(`${BASE_URL}/categories`, {
         name: formData.newCategoryName,
       });
       finalCategoryId = res.data.id;
@@ -70,9 +71,9 @@ function Dashboard() {
     };
 
     if (isEdit) {
-      await axios.patch(`http://localhost:5000/links/${formData.id}`, payload);
+      await axios.patch(`${BASE_URL}/links/${formData.id}`, payload);
     } else {
-      await axios.post("http://localhost:5000/links", payload);
+      await axios.post(`${BASE_URL}/links`, payload);
     }
 
     setFormData({
@@ -90,7 +91,7 @@ function Dashboard() {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/links/${id}`);
+    await axios.delete(`${BASE_URL}/links/${id}`);
     fetchLinks();
   };
 
