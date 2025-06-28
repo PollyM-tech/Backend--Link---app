@@ -1,8 +1,0 @@
-Flask
-Flask-RESTful
-Flask-Migrate
-Flask-Cors
-Flask-Bcrypt
-Flask-JWT-Extended
-python-dotenv
-gunicorn
