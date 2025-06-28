@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: flask-backend
+    env: python
+    plan: free
+    buildCommand: "pipenv install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    workingDir: backend
+    autoDeploy: true
