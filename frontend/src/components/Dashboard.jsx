@@ -145,7 +145,7 @@ function Dashboard() {
           <SearchBar 
             links={links}
             setFilteredLinks={setFilteredLinks}
-            activateCategory={activateCategory}
+            activeCategory={activeCategory}
             getCategoryName={getCategoryName}
             />
           
