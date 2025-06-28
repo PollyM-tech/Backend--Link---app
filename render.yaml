@@ -1,8 +1,7 @@
 services:
   - type: web
-    name: flask-backend
+    name: backend
     env: python
-    plan: free
-    buildCommand: "cd backend && pip install -r requirements.txt"
+    runtime: python-3.10.13 
+    buildCommand: "pip install -r backend/requirements.txt"
     startCommand: "cd backend && gunicorn app:app"
-    autoDeploy: true
