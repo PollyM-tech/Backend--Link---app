@@ -42,10 +42,17 @@ function Dashboard() {
     axios.defaults.headers.common["Authorization"] = `Bearer ${user.token}`;
     fetchCategories();
 
-    const storedTrashedLinks = JSON.parse(localStorage.getItem("trashedLinks")) || [];
+    const storedTrashedLinks =
+      JSON.parse(localStorage.getItem("trashedLinks")) || [];
     const now = Date.now();
-    const freshTrash = storedTrashedLinks.filter(link => now - new Date(link.deletedAt).getTime() < 30 * 24 * 60 * 60 * 1000);
-    const expiredTrash = storedTrashedLinks.filter(link => now - new Date(link.deletedAt).getTime() >= 30 * 24 * 60 * 60 * 1000);
+    const freshTrash = storedTrashedLinks.filter(
+      (link) =>
+        now - new Date(link.deletedAt).getTime() < 30 * 24 * 60 * 60 * 1000
+    );
+    const expiredTrash = storedTrashedLinks.filter(
+      (link) =>
+        now - new Date(link.deletedAt).getTime() >= 30 * 24 * 60 * 60 * 1000
+    );
 
     expiredTrash.forEach(async (link) => {
       await axios.delete(`${BASE_URL}/links/${link.id}`);
@@ -64,9 +71,52 @@ function Dashboard() {
 
   const fetchLinks = async (trashedIds = []) => {
     const res = await axios.get(`${BASE_URL}/links`);
-    const activeLinks = res.data.filter(link => !trashedIds.includes(link.id));
+    const activeLinks = res.data.filter(
+      (link) => !trashedIds.includes(link.id)
+    );
     setLinks(activeLinks);
     setFilteredLinks(activeLinks);
+  };
+
+  const handleCategoryDelete = async (categoryId) => {
+    try {
+      const linksToTrash = links.filter(
+        (link) => link.category_id === categoryId
+      );
+      const updatedTrash = [
+        ...trashedLinks,
+        ...linksToTrash.map((link) => ({
+          ...link,
+          deletedAt: new Date().toISOString(),
+        })),
+      ];
+
+      setTrashedLinks(updatedTrash);
+      localStorage.setItem("trashedLinks", JSON.stringify(updatedTrash));
+
+      const updatedLinks = links.filter(
+        (link) => link.category_id !== categoryId
+      );
+      setLinks(updatedLinks);
+
+      await axios.delete(`${BASE_URL}/categories/${categoryId}`);
+
+      await fetchCategories();
+
+      if (activeCategory === categoryId) {
+        setActiveCategory("All");
+        setFilteredLinks(updatedLinks);
+      } else if (activeCategory === "All") {
+        setFilteredLinks(updatedLinks);
+      } else {
+        setFilteredLinks(
+          updatedLinks.filter((link) => link.category_id === activeCategory)
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      alert("Failed to delete category. Please try again.");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -105,18 +155,27 @@ function Dashboard() {
 
     setShowModal(false);
     setIsEdit(false);
-    const storedTrashedLinks = JSON.parse(localStorage.getItem("trashedLinks")) || [];
+    const storedTrashedLinks =
+      JSON.parse(localStorage.getItem("trashedLinks")) || [];
     fetchLinks(storedTrashedLinks.map((l) => l.id));
   };
 
   const handleDelete = async (id) => {
     const linkToDelete = links.find((link) => link.id === id);
-    const updatedTrash = [...trashedLinks, { ...linkToDelete, deletedAt: new Date().toISOString() }];
+    const updatedTrash = [
+      ...trashedLinks,
+      { ...linkToDelete, deletedAt: new Date().toISOString() },
+    ];
     localStorage.setItem("trashedLinks", JSON.stringify(updatedTrash));
     setTrashedLinks(updatedTrash);
     const updatedLinks = links.filter((link) => link.id !== id);
     setLinks(updatedLinks);
-    setFilteredLinks(updatedLinks.filter((link) => activeCategory === "All" || link.category_id === activeCategory));
+    setFilteredLinks(
+      updatedLinks.filter(
+        (link) =>
+          activeCategory === "All" || link.category_id === activeCategory
+      )
+    );
   };
 
   const handleEdit = (link) => {
@@ -135,7 +194,8 @@ function Dashboard() {
     }
   };
 
-  const getLinkCount = (categoryId) => links.filter((link) => link.category_id === categoryId).length;
+  const getLinkCount = (categoryId) =>
+    links.filter((link) => link.category_id === categoryId).length;
 
   const getCategoryName = (categoryId) => {
     const cat = categories.find((c) => c.id === categoryId);
@@ -184,8 +244,21 @@ function Dashboard() {
 
   const handleEmptyTrash = async () => {
     for (let link of trashedLinks) {
-      await axios.delete(`${BASE_URL}/links/${link.id}`);
+      if (!link?.id) {
+        console.warn("Skipping invalid trashed link:", link);
+        continue;
+      }
+
+      try {
+        await axios.delete(`${BASE_URL}/links/${link.id}`);
+      } catch (err) {
+        console.error(
+          `Failed to delete link with id ${link.id}:`,
+          err.response?.status || err.message
+        );
+      }
     }
+
     setTrashedLinks([]);
     localStorage.setItem("trashedLinks", JSON.stringify([]));
   };
@@ -211,6 +284,7 @@ function Dashboard() {
           trashedLinks={trashedLinks}
           showTrash={showTrash}
           setShowTrash={setShowTrash}
+          handleCategoryDelete={handleCategoryDelete}
           TrashButton={
             <TrashButtons
               trashedLinksCount={trashedLinks.length}

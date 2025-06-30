@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 
 function Sidebar({ 
   categories, 
@@ -9,8 +9,16 @@ function Sidebar({
   handleCategoryFilter, 
   getLinkCount,
   showTrash,
-  TrashButton
+  TrashButton,
+  handleCategoryDelete
 }) {
+  const handleDeleteClick = (e, categoryId) => {
+    e.stopPropagation(); // Prevent triggering category filter
+    if (window.confirm('Are you sure you want to delete this category? All links in this category will be moved to trash.')) {
+      handleCategoryDelete(categoryId);
+    }
+  };
+
   return (
     <aside className="w-full md:w-64 bg-white p-4 shadow-md">
       <div
@@ -36,12 +44,23 @@ function Sidebar({
             <li
               key={cat.id}
               onClick={() => handleCategoryFilter(cat.id)}
-              className={`flex justify-between cursor-pointer ${
+              className={`flex justify-between items-center cursor-pointer group hover:bg-gray-50 p-2 rounded ${
                 activeCategory === cat.id && !showTrash ? "font-bold" : ""
               }`}
             >
-              <span>{cat.name}</span>
-              <span className="text-gray-500">{getLinkCount(cat.id)}</span>
+              <div className="flex justify-between items-center w-full">
+                <span>{cat.name}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500">{getLinkCount(cat.id)}</span>
+                  <button
+                    onClick={(e) => handleDeleteClick(e, cat.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-500 hover:text-red-700 p-1"
+                    title="Delete category"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
             </li>
           ))}
         </ul>
