@@ -1,11 +1,12 @@
-function Modal({ 
-  showModal, 
-  isEdit, 
-  formData, 
-  setFormData, 
-  categories, 
-  handleSubmit, 
-  setShowModal 
+function Modal({
+  showModal,
+  isEdit,
+  formData,
+  setFormData,
+  categories,
+  handleSubmit,
+  setShowModal,
+  setCategories,
 }) {
   if (!showModal) return null;
 
@@ -29,9 +30,7 @@ function Modal({
             type="url"
             placeholder="URL"
             value={formData.url}
-            onChange={(e) =>
-              setFormData({ ...formData, url: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, url: e.target.value })}
             className="w-full px-3 py-2 border rounded-md"
           />
           <textarea
@@ -71,18 +70,46 @@ function Modal({
           </select>
 
           {formData.category_id === "" && (
-            <input
-              type="text"
-              placeholder="New category name"
-              value={formData.newCategoryName}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  newCategoryName: e.target.value,
-                })
-              }
-              className="w-full px-3 py-2 border rounded-md"
-            />
+            <div className="space-y-2">
+              <input
+                type="text"
+                placeholder="New category name"
+                value={formData.newCategoryName}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    newCategoryName: e.target.value,
+                  })
+                }
+                className="w-full px-3 py-2 border rounded-md"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (formData.newCategoryName.trim()) {
+                    // Create new category object
+                    const newCategory = {
+                      id: Date.now().toString(), // Simple ID generation
+                      name: formData.newCategoryName.trim(),
+                    };
+
+                    // Add to categories array (assuming you have a setCategories function)
+                    setCategories((prev) => [...prev, newCategory]);
+
+                    // Update form data to select the new category
+                    setFormData({
+                      ...formData,
+                      category_id: newCategory.id,
+                      newCategoryName: "",
+                    });
+                  }
+                }}
+                disabled={!formData.newCategoryName.trim()}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                Save Category
+              </button>
+            </div>
           )}
 
           <div className="flex justify-end gap-2">
