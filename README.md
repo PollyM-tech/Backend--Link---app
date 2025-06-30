@@ -8,6 +8,9 @@ The goal of this app is to make it easier for users to keep track of useful link
 
 ---
 
+## 🎥 Demo Video  
+Watch our walkthrough here: [LinkSaver App Demo on Loom](https://www.loom.com/share/a53e69a606ca408d8ad69ea30a3c3993)
+
 ## ✅ User Stories
 
 We focused on building features that directly respond to these user stories:

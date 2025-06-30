@@ -87,16 +87,13 @@ function Modal({
                 type="button"
                 onClick={() => {
                   if (formData.newCategoryName.trim()) {
-                    // Create new category object
                     const newCategory = {
-                      id: Date.now().toString(), // Simple ID generation
+                      id: Date.now().toString(),
                       name: formData.newCategoryName.trim(),
                     };
 
-                    // Add to categories array (assuming you have a setCategories function)
                     setCategories((prev) => [...prev, newCategory]);
 
-                    // Update form data to select the new category
                     setFormData({
                       ...formData,
                       category_id: newCategory.id,
