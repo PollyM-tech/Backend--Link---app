@@ -10,6 +10,7 @@ import FloatingIcon from "./FloatingIcon";
 import TrashView from "./TrashView";
 import TrashButtons from "./TrashButtons";
 import { BASE_URL } from "../utilis";
+import { toast } from "react-toastify";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -115,7 +116,7 @@ function Dashboard() {
       }
     } catch (error) {
       console.error("Error deleting category:", error);
-      alert("Failed to delete category. Please try again.");
+      toast.error("Failed to delete category. Please try again.");
     }
   };
 

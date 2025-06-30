@@ -1,22 +1,52 @@
 import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
 
-function Sidebar({ 
-  categories, 
-  links, 
-  activeCategory, 
-  expandSidebar, 
-  setExpandSidebar, 
-  handleCategoryFilter, 
+function Sidebar({
+  categories,
+  links,
+  activeCategory,
+  expandSidebar,
+  setExpandSidebar,
+  handleCategoryFilter,
   getLinkCount,
   showTrash,
   TrashButton,
-  handleCategoryDelete
+  handleCategoryDelete,
 }) {
   const handleDeleteClick = (e, categoryId) => {
     e.stopPropagation(); // Prevent triggering category filter
-    if (window.confirm('Are you sure you want to delete this category? All links in this category will be moved to trash.')) {
-      handleCategoryDelete(categoryId);
-    }
+
+    toast.warn(
+      ({ closeToast }) => (
+        <div>
+          <p className="mb-2">
+            Delete this category? Links will be moved to trash.
+          </p>
+          <div className="flex gap-4">
+            <button
+              onClick={() => {
+                handleCategoryDelete(categoryId);
+                closeToast();
+              }}
+              className="text-red-600 underline cursor-pointer"
+            >
+              Confirm
+            </button>
+            <button
+              onClick={closeToast}
+              className="text-blue-600 underline cursor-pointer"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+      }
+    );
   };
 
   return (
@@ -54,7 +84,7 @@ function Sidebar({
                   <span className="text-gray-500">{getLinkCount(cat.id)}</span>
                   <button
                     onClick={(e) => handleDeleteClick(e, cat.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-500 hover:text-red-700 p-1"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-500 hover:text-red-700 p-1 cursor-pointer"
                     title="Delete category"
                   >
                     <Trash2 size={14} />
